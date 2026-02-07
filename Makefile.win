@@ -1,0 +1,70 @@
+###############################################################################
+# Makefile.win - Windows build using MinGW (MSYS2)
+#
+# Usage (from MSYS2 MinGW64 shell, or with MinGW bin in PATH):
+#   mingw32-make -f Makefile.win game
+#   mingw32-make -f Makefile.win clean
+###############################################################################
+
+CXX = g++
+CXXFLAGS = -w -std=c++11
+LDFLAGS = -lmingw32 -lSDL2main -lSDL2 -lopengl32 -lglu32 -lpthread
+
+###############################################################################
+# Targets
+###############################################################################
+game : main.o environment.o entity.o vector.o graphics.o sound.o audio.o texture.o sprite.o
+	$(CXX) -o game.exe $^ $(LDFLAGS)
+
+debug : main.o environment.o entity.o vector.o graphics.o sound.o audio.o texture.o sprite.o
+	$(CXX) -o game.exe $^ $(LDFLAGS)
+
+vectorTest : vectorTest.o vector.o
+	$(CXX) -o vectorTest.exe vectorTest.o vector.o
+
+audioTest : audioTest.o audio.o sound.o
+	$(CXX) -o audioTest.exe audioTest.o audio.o sound.o $(LDFLAGS)
+
+###############################################################################
+# Object files
+###############################################################################
+main.o: main.cpp environment.h
+	$(CXX) $(CXXFLAGS) -c main.cpp
+
+environment.o : environment.cpp environment.h graphics.h entity.h sprite.h audio.h
+	$(CXX) $(CXXFLAGS) -c environment.cpp
+
+entity.o : entity.cpp entity.h vector.h sprite.h graphics.h
+	$(CXX) $(CXXFLAGS) -c entity.cpp
+
+vector.o : vector.cpp vector.h
+	$(CXX) $(CXXFLAGS) -c vector.cpp
+
+vectorTest.o : vectorTest.cpp vector.h
+	$(CXX) $(CXXFLAGS) -c vectorTest.cpp
+
+graphics.o : graphics.cpp graphics.h texture.h
+	$(CXX) $(CXXFLAGS) -c graphics.cpp
+
+sprite.o : sprite.cpp sprite.h texture.h graphics.h
+	$(CXX) $(CXXFLAGS) -c sprite.cpp
+
+texture.o : texture.cpp texture.h
+	$(CXX) $(CXXFLAGS) -c texture.cpp
+
+audio.o : audio.cpp audio.h sound.h
+	$(CXX) $(CXXFLAGS) -c audio.cpp
+
+sound.o : sound.cpp sound.h
+	$(CXX) $(CXXFLAGS) -c sound.cpp
+
+audioTest.o : audioTest.cpp audio.h sound.h
+	$(CXX) $(CXXFLAGS) -c audioTest.cpp
+
+###############################################################################
+# Utility
+###############################################################################
+clean :
+	del /Q *.o *.exe 2>NUL
+
+all : game vectorTest audioTest
